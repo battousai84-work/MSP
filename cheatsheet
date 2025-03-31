@@ -1,1 +1,15 @@
 # cheat sheet for terminal commands
+# opening network adapters
+control netconnections
+
+# net local users
+lusrmgr.msc
+
+# creds manager
+control keymgr
+
+# system information
+control system
+
+# find and kill process
+Get-Process | Where-Object { $_.Name -eq "myprocess" } | Select-Object -First 1 | Stop-Process
