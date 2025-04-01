@@ -1,4 +1,3 @@
-# cheat sheet for terminal commands
 # opening network adapters
 control netconnections
 
@@ -13,3 +12,91 @@ control system
 
 # find and kill process
 Get-Process | Where-Object { $_.Name -eq "myprocess" } | Select-Object -First 1 | Stop-Process
+
+# monitors
+Get-WmiObject -Class Win32_DesktopMonitor | findstr VideoOutputTechnology
+
+1 = VGA 
+2 = DVI 
+3 = HDMI 
+4 = DisplayPort 
+5 = Other 
+6 = Unknown 
+
+#######################Printers################################################################################
+wmic printer list brief - wmic is discontinued
+
+# get all printers and foreach printer port create object with printername and printer ip
+Get-Printer | ForEach-Object {
+    $port = Get-PrinterPort -Name $_.PortName
+    [PSCustomObject]@{
+        Name = $_.Name
+        IPAddress = $port.PrinterHostAddress
+    }
+} | Format-Table -AutoSize
+
+
+#extract printers with WDS
+$printer = Get-Printer | Where-Object {$_.PortName -like 'WSD-*'}
+# pull values from $printer
+  $ipAddress = $port.HostAddress
+  $port = Get-PrinterPort -Name $portName
+  $portName = $printer.PortName
+
+#set default printer
+(Get-WmiObject -Class Win32_Printer -Filter "Name='Your Printer Name'").SetDefaultPrinter()
+https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/rundll32-printui
+
+ga=global add printer
+gd=global delete printer
+
+rundll32 printui.dll,PrintUIEntry /ga /c\COMPUTER_NAME /n"\PRINTSERVER\PRINTERNAME"
+
+rundll32 printui.dll,PrintUIEntry /gd /c\COMPUTER_NAME /n"\PRINTSERVER\PRINTERNAME"
+
+sc \COMPUTER_NAME stop spooler
+
+sc \COMPUTER_NAME start spooler
+
+pause
+
+# delete printer 
+$Printer = Get-WmiObject win32_printer | where {$_.name -imatch "$Description"}
+$Printer.Delete()
+
+Get-WmiObject win32_printer | select -Property name
+
+#######################Patch And Updates################################################################################
+# patch information
+wmic qfe list full - wmic is discontinued
+Get-HotFix -Description "Security*"
+
+# check reset authorize and check now for updates
+wuauclt.exe /resetauthorization /detectnow
+
+#######################Software and uninstall################################################################################
+# installed software
+wmic product get name, version, vendor - wmic is discontinued
+ wmic product where “Vendor like ‘%Microsoft%’” get Name, Version - wmic is discontinued
+wmic /output:“C:\software.txt” product get Name, Version - wmic is discontinued
+
+Get-WmiObject Win32_Product | Where-Object {$_.Name -like "*<ApplicationName>*"} | Format-Table IdentifyingNumber, Name, Version -AutoSize
+
+# powershell uninstall
+$Prod = Get-CimInstance -ClassName Win32_Product -Filter “Name Like ‘Kaspersky Endpoint Security%’”
+$Guid = $Prod.IdentifyingNumber
+msiexec.exe /x $Guid KLLOGIN=KLAdmin KLPASSWD=password /qn
+
+# uninstall software with msi
+msiexec.exe /uninstall {GUID}
+
+# installing silently 
+Universal Silent Switch Finder tool <<< download tool to find silent msi switches
+
+#######################User accounts################################################################################
+# user accounts
+net user
+net user localgroup "Administrators"
+
+# add local user domain account without having them sign in
+Add-LocalGroupMember -Group "Administrators" -Member "CONTOSO\jane.doe"
