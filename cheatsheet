@@ -99,4 +99,27 @@ net user
 net user localgroup "Administrators"
 
 # add local user domain account without having them sign in
-Add-LocalGroupMember -Group "Administrators" -Member "CONTOSO\jane.doe"
+Get-LocalGroup
+
+Add-LocalGroupMember -Group "*Administrators or Users*" -Member "CONTOSO\jane.doe"
+
+# is pc in a domain
+echo %USERDOMAIN%
+
+# delete user
+net user "username" /delete
+# remove users directory
+rd /s /q "C:\Users\username"
+
+# lock work station
+Rundll32.exe user32.dll,LockWorkStation
+shutdown /l  <<< log out
+
+# open file explorer in current users temp directory
+start %temp%
+
+#######################Networking################################################################################
+
+# set static ip and dns
+netsh interface ip set address name ="Ethernet" source=static address="192.168.1.100" mask="255.255.255.0" gateway="192.168.1.1" gateway_route="192.168.1.1"
+netsh interface ip set dns name="Ethernet" source=static address="8.8.8.8" validate=yes
