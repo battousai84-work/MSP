@@ -13,6 +13,9 @@ control system
 # find and kill process
 Get-Process | Where-Object { $_.Name -eq "myprocess" } | Select-Object -First 1 | Stop-Process
 
+#check if running
+tasklist | findstr 
+
 # monitors
 Get-WmiObject -Class Win32_DesktopMonitor | findstr VideoOutputTechnology
 
@@ -44,7 +47,11 @@ $printer = Get-Printer | Where-Object {$_.PortName -like 'WSD-*'}
   $portName = $printer.PortName
 
 #set default printer
+Get-WmiObject win32_printer | select -Property name
+
 (Get-WmiObject -Class Win32_Printer -Filter "Name='Your Printer Name'").SetDefaultPrinter()
+
+
 https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/rundll32-printui
 
 ga=global add printer
@@ -64,7 +71,6 @@ pause
 $Printer = Get-WmiObject win32_printer | where {$_.name -imatch "$Description"}
 $Printer.Delete()
 
-Get-WmiObject win32_printer | select -Property name
 
 #######################Patch And Updates################################################################################
 # patch information
@@ -123,3 +129,34 @@ start %temp%
 # set static ip and dns
 netsh interface ip set address name ="Ethernet" source=static address="192.168.1.100" mask="255.255.255.0" gateway="192.168.1.1" gateway_route="192.168.1.1"
 netsh interface ip set dns name="Ethernet" source=static address="8.8.8.8" validate=yes
+
+
+# delete folder and files
+del * /S /Q
+
+rmdir /S /Q "C:\Users\Desktop\New folder\"
+
+
+# default browser from command line
+HKEY_CURRENT_USER\Software\Classes\http\shell\open\command\(Default)
+
+# setting default file types
+You can use assoc and ftype.
+
+cmd /c assoc /?
+
+cmd /c ftype /?
+
+# hard drive health check
+DISM /Online /Cleanup-Image /RestoreHealth
+CHKDSK C: /F /V /R /offlinescanandfix
+SFC /scannow
+
+
+# run powershell start AD sync
+ Start-ADSyncSyncCycle -PoliceType Delta
+
+# open adapter
+control netconnections
+
+
