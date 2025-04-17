@@ -13,8 +13,10 @@ control system
 # find and kill process
 Get-Process | Where-Object { $_.Name -eq "myprocess" } | Select-Object -First 1 | Stop-Process
 
-#check if running
-tasklist | findstr 
+#check if ncentral running
+tasklist | findstr NCentral
+NCentralRDLdr.exe            12104 Console                    1     12,384 K
+NCentralRDViewer.exe         14176 Console                    1     52,428 K
 
 # monitors
 Get-WmiObject -Class Win32_DesktopMonitor | findstr VideoOutputTechnology
@@ -160,3 +162,22 @@ SFC /scannow
 control netconnections
 
 
+# remove agent with command line
+# will need to find the GUID 
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\orComputer\HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\
+MsiExec.exe /qn /X{*GUID found in reg from path above*}
+
+# export default apps note you have to be under the user and with elevated command shell
+Dism /Online /Export-DefaultAppAssociations:"C:\Temp\AppAssociations.xml"
+
+Dism.exe /Image:C:\test\offline /Import-DefaultAppAssociations:F:\AppAssociations.xml
+
+
+
+#####################################################################################################################################################################################################
+#####################################################################################################################################################################################################
+MAC OS 
+#####################################################################################################################################################################################################
+#add user to be a local admin
+sudo dseditgroup -o edit -a john -t user admin
+sudo dseditgroup -o edit -a john -t user wheel
